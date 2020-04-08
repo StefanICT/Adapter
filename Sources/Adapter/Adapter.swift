@@ -21,7 +21,7 @@ public class Adapter: NSObject {
 
     private var registeredCells: Set<String>
 
-    private var width: CGFloat?
+    private var width: CGFloat
     private var observationFrame: NSKeyValueObservation?
 
     public init(tableView: UITableView) {
@@ -30,6 +30,8 @@ public class Adapter: NSObject {
         sections = []
 
         registeredCells = []
+
+        width = 0
 
         super.init()
 
@@ -59,7 +61,7 @@ public class Adapter: NSObject {
     }
 
     public func reloadHeaderView() {
-        width = nil
+        width = 0
         updateHeaderView()
     }
 
