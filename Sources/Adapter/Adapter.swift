@@ -4,25 +4,18 @@ import UIKit
 public class Adapter: NSObject {
     private let tableView: UITableView
 
-    public var headerView: UIView? {
-        didSet {
-            reloadHeaderView()
-        }
-    }
+    public var headerView: UIView?
 
     public var sections: [Section] {
         didSet {
             registerCells()
-            reloadData()
+            notifySectionsChanged()
         }
     }
-
-    private var observationHeaderViewIsHidden: NSKeyValueObservation?
 
     private var registeredCells: Set<String>
 
     private var width: CGFloat
-    private var observationFrame: NSKeyValueObservation?
 
     public init(tableView: UITableView) {
         self.tableView = tableView
@@ -35,9 +28,7 @@ public class Adapter: NSObject {
 
         super.init()
 
-        observationFrame = self.tableView.layer.observe(\.frame) { [weak self] _, _ in
-            self?.updateHeaderView()
-        }
+        self.tableView.setNeedsLayout()
 
         self.tableView.dataSource = self
         self.tableView.delegate = self
@@ -55,33 +46,51 @@ public class Adapter: NSObject {
         }
     }
 
-    public func reloadData() {
-        reloadHeaderView()
+    public func notifySectionsChanged() {
+        updateHeaderView(force: true)
+        updateHeaderView()
         tableView.reloadData()
     }
 
-    public func reloadHeaderView() {
-        width = 0
-        updateHeaderView()
-    }
-
-    private func updateHeaderView() {
+    /// Update the header view and the layout.
+    ///
+    /// This method must be called in the UIViewController the assure correct
+    /// layout in different sizes. Example:
+    ///
+    /// ```
+    /// override func viewDidLayoutSubviews() {
+    ///     super.viewDidLayoutSubviews()
+    ///
+    ///     adapter.updateHeaderView()
+    /// }
+    ///
+    /// override func viewWillTransition(to size: CGSize,
+    ///                                  with coordinator: UIViewControllerTransitionCoordinator) {
+    ///     super.viewWillTransition(to: size, with: coordinator)
+    ///
+    ///     coordinator.animate(alongsideTransition: { _ in
+    ///         self.adapter.updateHeaderView()
+    ///     })
+    /// }
+    /// ```
+    ///
+    /// - Parameter force: Force an update of the view. This can be needed if
+    ///   the size of the view has changed. For example an label has new text.
+    public func updateHeaderView(force: Bool = false) {
         guard let headerView = headerView else {
-            observationHeaderViewIsHidden = nil
             tableView.tableHeaderView = nil
             return
         }
 
-        observationHeaderViewIsHidden = headerView.layer.observe(\.isHidden) { [weak self] _, _ in
-            self?.reloadHeaderView()
-        }
-
-        guard !headerView.isHidden else {
-            tableView.tableHeaderView = nil
+        // Make sure we have a size otherwise we cannot layout. Sometimes we get
+        // a valid width but an invalid height. To avoid calculating layout we
+        // wait on some height as well.
+        guard tableView.frame.size.width > 0 && tableView.frame.size.height > 0 else {
             return
         }
 
-        guard tableView.frame.size.width != width else {
+        // Short circuit work here
+        guard tableView.frame.size.width != width || force else {
             return
         }
 
@@ -89,17 +98,17 @@ public class Adapter: NSObject {
 
         tableView.tableHeaderView = headerView
 
+        // Save width for next cycle.
         width = tableView.frame.size.width
     }
 
-    private func headerFooterSystemLayoutSizeFitting(_ view: UIView) -> CGRect {
-        let targetSize = CGSize(width: tableView.frame.size.width,
-        height: UIView.layoutFittingCompressedSize.height)
-        let size = view.systemLayoutSizeFitting(targetSize,
-                                     withHorizontalFittingPriority: .required,
-                                     verticalFittingPriority: .defaultLow)
-
-        return CGRect(x: 0, y: 0, width: size.width, height: size.height)
+    private func headerFooterSystemLayoutSizeFitting(_ view: UIView,
+                                                     width: CGFloat) -> CGSize {
+        let targetSize = CGSize(width: width,
+                                height: UIView.layoutFittingCompressedSize.height)
+        return view.systemLayoutSizeFitting(targetSize,
+                                            withHorizontalFittingPriority: .required,
+                                            verticalFittingPriority: .defaultLow)
     }
 }
 
@@ -225,4 +234,3 @@ extension Adapter: UIScrollViewDelegate {
         }
     }
 }
-
