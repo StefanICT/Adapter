@@ -82,24 +82,28 @@ public class Adapter: NSObject {
             return
         }
 
+        let width = tableView.frame.size.width
+        let height = tableView.frame.size.height
+
         // Make sure we have a size otherwise we cannot layout. Sometimes we get
         // a valid width but an invalid height. To avoid calculating layout we
         // wait on some height as well.
-        guard tableView.frame.size.width > 0 && tableView.frame.size.height > 0 else {
+        guard width > 0 && height > 0 else {
             return
         }
 
         // Short circuit work here
-        guard tableView.frame.size.width != width || force else {
+        guard width != self.width || force else {
             return
         }
 
-        headerView.frame = headerFooterSystemLayoutSizeFitting(headerView)
+        let size = headerFooterSystemLayoutSizeFitting(headerView, width: width)
+        headerView.frame = CGRect(x: 0, y: 0, width: size.width, height: size.height)
 
         tableView.tableHeaderView = headerView
 
         // Save width for next cycle.
-        width = tableView.frame.size.width
+        self.width = tableView.frame.size.width
     }
 
     private func headerFooterSystemLayoutSizeFitting(_ view: UIView,
