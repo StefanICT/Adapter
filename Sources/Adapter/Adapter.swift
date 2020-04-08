@@ -73,7 +73,7 @@ public class Adapter: NSObject {
         }
 
         observationHeaderViewIsHidden = headerView.layer.observe(\.isHidden) { [weak self] _, _ in
-            self?.updateHeaderView()
+            self?.reloadHeaderView()
         }
 
         guard !headerView.isHidden else {
@@ -82,11 +82,6 @@ public class Adapter: NSObject {
         }
 
         guard tableView.frame.size.width != width else {
-            if tableView.tableHeaderView == nil {
-                // Could be that is hidden was toggled. To avoid extra work
-                // do not always do this.
-                tableView.tableHeaderView = headerView
-            }
             return
         }
 
