@@ -1,17 +1,17 @@
 import UIKit
 
 public class TableViewAdapter: NSObject {
-    let tableView: UITableView
+    public let tableView: UITableView
 
-    var sections: [Section] {
+    public var sections: [Section] {
         didSet {
             notifySectionsChanged()
         }
     }
 
-    var registeredCells: Set<String>
+    public var registeredCells: Set<String>
 
-    var isScrolling: Bool {
+    public var isScrolling: Bool {
         return tableView.isDecelerating || tableView.isDragging
     }
 
