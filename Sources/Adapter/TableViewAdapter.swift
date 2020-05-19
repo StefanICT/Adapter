@@ -15,7 +15,7 @@ public class TableViewAdapter: NSObject {
         return tableView.isDecelerating || tableView.isDragging
     }
 
-    init(_ tableView: UITableView) {
+    public init(_ tableView: UITableView) {
         self.tableView = tableView
 
         sections = []
