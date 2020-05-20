@@ -17,8 +17,8 @@ public final class ItemView<Cell: AnyObject, Item>: ItemViewConfigurator {
     public let height: Height
 
     public var fill: ((Cell, Item, Info) -> Void)?
-    public var select: ((Item, Cell, Info) -> Bool)?
-    public var deselect: ((Item, Cell, Info) -> Void)?
+    public var select: ((Cell, Item, Info) -> Bool)?
+    public var deselect: ((Cell, Item, Info) -> Void)?
 
     public init(_ item: Item,
                 _ height: Height = .estimated(96),
@@ -33,10 +33,10 @@ public final class ItemView<Cell: AnyObject, Item>: ItemViewConfigurator {
     }
 
     public func didSelect(_ cell: UIView, _ info: Info) -> Bool {
-        select?(item, (cell as! Cell), info) ?? false
+        select?((cell as! Cell), item, info) ?? false
     }
 
     public func didDeselect(_ cell: UIView, _ info: Info) -> Void {
-        deselect?(item, (cell as! Cell), info)
+        deselect?((cell as! Cell), item, info)
     }
 }
