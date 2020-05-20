@@ -1,6 +1,6 @@
 import UIKit
 
-public final class ItemView<Cell: AnyObject, Item>: ItemViewConfigurator {
+public class ItemView<Cell: AnyObject, Item>: ItemViewConfigurator {
     public static var identifier: String {
         return [
             String(describing: self),
