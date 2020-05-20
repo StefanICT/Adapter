@@ -20,8 +20,8 @@ public final class ItemView<Cell: AnyObject, Item>: ItemViewConfigurator {
     public var select: ((Item, Cell, Info) -> Bool)?
     public var deselect: ((Item, Cell, Info) -> Void)?
 
-    public init(item: Item,
-                height: Height = .estimated(96),
+    public init(_ item: Item,
+                _ height: Height = .estimated(96),
                 fill: ((Cell, Item, Info) -> Void)? = nil) {
         self.item = item
         self.height = height

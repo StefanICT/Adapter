@@ -1,6 +1,6 @@
 import Foundation
 
 public struct Info {
-    let indexPath: IndexPath
-    let isScrolling: Bool
+    public let indexPath: IndexPath
+    public let isScrolling: Bool
 }
